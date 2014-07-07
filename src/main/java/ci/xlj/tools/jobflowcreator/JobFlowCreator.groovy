@@ -31,28 +31,25 @@ class JobFlowCreator {
 	private static Logger logger = Logger.getLogger(JobFlowCreator.class)
 
 	private def showCopyRight() {
-		println
-		'''Job Flow Creator v1.0.0 of 4 Jul. 2014, by Mr. Xu Lijia.
-		   Send bug reports via email icbcsdcpmoxulj@outlook.com
-		   This tool is used to create a complete job flow on Jenkins Server at a time.'''
+		println '''Job Flow Creator v1.0.0 of 4 Jul. 2014, by Mr. Xu Lijia.
+Send bug reports via email icbcsdcpmoxulj@outlook.com
+This tool is used to create a complete job flow on Jenkins Server at a time.\n'''
 	}
 
 	/**                                                                                                                                                 
 	 * show help message                                                                                                                                
 	 */                                                                                                                                                 
 	private def showUsage() {
-		println
-		'''Usage:
+		println	'''Usage:
 		   
-		   1. Start from command line
-		      java -jar jobflowcreator.jar <First_Job_Name_in_the_Flow> <New_Value_for_the_Replaced_Segment>
-		   OR
-           2. Called by pi-jobflowcreator plugin
-              java -jar jobflowcreator.jar <First_Job_Name_in_the_Flow> \
-                                           <Job_Name_Segment_Pattern> <New_Value_for_the_Replaced_Segment> \
-										   <Jenkins_Server_Url> <Username> <Password> \
-										   <Jobs_directory>
-		      Create a new version for the specific job flow.'''
+1. Start from command line
+   java -jar jobflowcreator.jar <First_Job_Name_in_the_Flow> <New_Value_for_the_Replaced_Segment>
+OR
+2. Called by pi-jobflowcreator plugin
+   java -jar jobflowcreator.jar <First_Job_Name_in_the_Flow> 
+                                <Job_Name_Segment_Pattern> <New_Value_for_the_Replaced_Segment> 
+                                <Jenkins_Server_Url> <Username> <Password> 
+                                <Jobs_directory>'''
 	}
 
 	static main(args) {
@@ -81,14 +78,14 @@ class JobFlowCreator {
 			jobsDir=args[6]
 
 			init()
-			createJobFlow(args[0], args[1], args[2])
+			createAJobFlow(args[0], args[1], args[2])
 
 		} else if (args.length == 2) {
 			Globals.START_FROM_CMD = true
 
 			ConfigLoader.load()
 			init()
-			createJobFlow(args[0], Globals.JOB_NAME_PATTERN,Globals.REPLACED_PATTERN)
+			createAJobFlow(args[0], Globals.JOB_NAME_PATTERN,Globals.REPLACED_PATTERN)
 
 		} else {
 			println 'Invalid parameters. See usage for details.'
@@ -119,7 +116,7 @@ class JobFlowCreator {
 		}
 	}
 
-	private def createJobFlow(firstJobName, jobNamePattern,replacement) {
+	private def createAJobFlow(firstJobName, jobNamePattern,replacement) {
 		buildATree(firstJobName)
 		// traverse the tree
 		traverseTree(jobNamePattern,replacement)
@@ -137,32 +134,30 @@ class JobFlowCreator {
 				ConfigUtils.getConfigFile((Globals.START_FROM_CMD ? Globals.JOBS_DIR:jobsDir)
 				+ File.separator + firstJobName))
 
-		recursivelyAdd(root)
+		recursivelyAddNode(root)
 	}
 
 	/**                                                                                                                                                 
 	 * recursive add tree nodes                                                                                                                          
 	 */                                                                                                                                                 
-	private def recursivelyAdd(JobNode node) {
+	private def recursivelyAddNode(JobNode node) {
 		v.getDownStreamJobNameList(node.jobName).each{
 			def tempNode=new JobNode(it, ConfigUtils.getConfigFile((Globals.START_FROM_CMD?Globals.JOBS_DIR:jobsDir)+File.separator+it))
 			node.addASuccessor(tempNode)
-			recursivelyAdd(tempNode)
+			recursivelyAddNode(tempNode)
 		}
 	}
 
 	private def traverseTree(jobNamePattern,replacement) {
 		if (root) {
-			recursivelyVisit(root, jobNamePattern,replacement)
+			recursivelyVisitNode(root, jobNamePattern,replacement)
 		}
 	}
-
-	def xslurper
 
 	/**                                                                                                                                                 
 	 * recursive visit tree node                                                                                                                        
 	 */                                                                                                                                                 
-	private def recursivelyVisit(node, jobNamePattern,replacement) {
+	private def recursivelyVisitNode(JobNode node, jobNamePattern,replacement) {
 		def newJobName = node.jobName.replaceFirst(jobNamePattern,
 				replacement)
 
@@ -186,7 +181,7 @@ class JobFlowCreator {
 		}
 
 		node.getSuccessors().each{
-			recursivelyVisit(it, jobNamePattern,replacement)
+			recursivelyVisitNode(it, jobNamePattern,replacement)
 		}
 	}
 }
