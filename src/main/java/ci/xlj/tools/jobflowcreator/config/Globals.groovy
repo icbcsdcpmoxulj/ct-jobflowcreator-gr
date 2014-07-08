@@ -21,7 +21,7 @@ package ci.xlj.tools.jobflowcreator.config;
 
 class Globals {
 
-	static final String JFC_HOME;
+	static String JFC_HOME;
 
 	static String URL;
 
@@ -35,6 +35,6 @@ class Globals {
 	
 	static String REPLACED_PATTERN;
 	
-	static final boolean START_FROM_CMD;
+	static boolean START_FROM_CMD;
 
 }

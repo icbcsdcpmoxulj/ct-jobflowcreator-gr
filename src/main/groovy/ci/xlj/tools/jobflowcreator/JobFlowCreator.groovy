@@ -19,16 +19,19 @@
 
 package ci.xlj.tools.jobflowcreator
 
+import groovy.xml.StreamingMarkupBuilder;
+
 import org.apache.log4j.Logger
 
 import ci.xlj.libs.jenkinsvisitor.JenkinsVisitor
 import ci.xlj.libs.utils.ConfigUtils
+import ci.xlj.libs.utils.OSUtils
 import ci.xlj.tools.jobflowcreator.config.ConfigLoader
 import ci.xlj.tools.jobflowcreator.config.Globals
 
 class JobFlowCreator {
 
-	private static Logger logger = Logger.getLogger(JobFlowCreator.class)
+	private Logger logger = Logger.getLogger(JobFlowCreator)
 
 	private def showCopyRight() {
 		println '''Job Flow Creator v1.0.0 of 4 Jul. 2014, by Mr. Xu Lijia.
@@ -116,72 +119,57 @@ OR
 		}
 	}
 
+	private def newJobNames=new HashSet<String>()
+
+	private def message=""
+
 	private def createAJobFlow(firstJobName, jobNamePattern,replacement) {
-		buildATree(firstJobName)
-		// traverse the tree
-		traverseTree(jobNamePattern,replacement)
-	}
-
-	private JobNode root
-
-	private def buildATree(String firstJobName) {
 		if (!v.getJobNameList().contains(firstJobName)) {
 			println "Job ${firstJobName} does not exist."
 			System.exit(-3)
 		}
 
-		root = new JobNode(firstJobName,
-				ConfigUtils.getConfigFile((Globals.START_FROM_CMD ? Globals.JOBS_DIR:jobsDir)
-				+ File.separator + firstJobName))
-
-		recursivelyAddNode(root)
+		createAJob(firstJobName, jobNamePattern, replacement)
 	}
 
-	/**                                                                                                                                                 
-	 * recursive add tree nodes                                                                                                                          
-	 */                                                                                                                                                 
-	private def recursivelyAddNode(JobNode node) {
-		v.getDownStreamJobNameList(node.jobName).each{
-			def tempNode=new JobNode(it, ConfigUtils.getConfigFile((Globals.START_FROM_CMD?Globals.JOBS_DIR:jobsDir)+File.separator+it))
-			node.addASuccessor(tempNode)
-			recursivelyAddNode(tempNode)
+	private def createAJob(jobName,jobNamePattern,replacement) {
+		def configXml=ConfigUtils.getConfigFile((Globals.START_FROM_CMD ? Globals.JOBS_DIR:jobsDir)
+				+ File.separator + jobName)
+		if(!configXml.exists()){
+			message<<"Job ${jobName} does not exist."<<OSUtils.getOSLineSeparator()
+			return
 		}
-	}
 
-	private def traverseTree(jobNamePattern,replacement) {
-		if (root) {
-			recursivelyVisitNode(root, jobNamePattern,replacement)
-		}
-	}
+		def xml=new XmlSlurper().parse(configXml)
+		xml.publishers.'hudson.tasks.BuildTrigger'.childProjects=xml.publishers.'hudson.tasks.BuildTrigger'.childProjects.text().replaceAll(jobNamePattern, replacement)
 
-	/**                                                                                                                                                 
-	 * recursive visit tree node                                                                                                                        
-	 */                                                                                                                                                 
-	private def recursivelyVisitNode(JobNode node, jobNamePattern,replacement) {
-		def newJobName = node.jobName.replaceFirst(jobNamePattern,
-				replacement)
-
-		def configXml=new XmlSlurper().parse(node.config)
-		configXml.childProjects=configXml.childProjects.text().replaceAll(jobNamePattern, replacement)
-
-		def result = v.create(newJobName, configXml)
-
+		def newJobName=jobName.replaceFirst(jobNamePattern, replacement)
+		def newXml=new StreamingMarkupBuilder()
+		def result=v.create(newJobName,newXml.bindNode(xml).toString())
 		if (result == 200) {
-			println "Job ${newJobName} created successfully."
-			logger.info "Job ${newJobName} created successfully."
+			def m="Job ${newJobName} created successfully."
+			message<<m<<OSUtils.getOSLineSeparator()
+			println m
+			logger.info m
 		} else {
-			println "Error in creating job ${newJobName}. See log for details."
+			def m="Error in creating job ${newJobName}. See log for details."
+			message<<m<<OSUtils.getOSLineSeparator()
+			println m
 
 			def res = v.responseContent
 			if (res.contains('A job already exists')) {
-				logger.error("Job ${newJobName} already exists.")
+				def n="Job ${newJobName} already exists."
+				message<<n<<OSUtils.getOSLineSeparator()
+				logger.error n
 			} else {
-				logger.error(res)
+				logger.error res
 			}
 		}
 
-		node.getSuccessors().each{
-			recursivelyVisitNode(it, jobNamePattern,replacement)
+		def a=v.getDownStreamJobNameList(jobName)
+		v.getDownStreamJobNameList(jobName).each {
+			createAJobFlow(it, jobNamePattern,replacement)
 		}
 	}
+
 }
