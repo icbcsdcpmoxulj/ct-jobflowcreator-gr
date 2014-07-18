@@ -3,7 +3,7 @@
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
+ * (the "License") you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
@@ -17,24 +17,32 @@
 
 //      Contributors:      Xu Lijia
 
-package ci.xlj.tools.jobflowcreator.config;
+package ci.xlj.tools.jobflowcreator.config
 
+/**
+ * Globals vars
+ * 
+ * @author kfzx-xulj
+ *
+ */
 class Globals {
 
-	static String JFC_HOME;
-
-	static String URL;
-
-	static String USERNAME;
-
-	static String PASSWORD;
-
-	static String JOBS_DIR;
+	static String JFC_HOME
 	
-	static String JOB_NAME_PATTERN;
+	static final String CONFIG_FILE='jfc-config.properties'
+
+	static String URL
+
+	static String USERNAME
+
+	static String PASSWORD
+
+	static String JOBS_DIR
 	
-	static String REPLACED_PATTERN;
+	static String JOB_NAME_PATTERN
 	
-	static boolean START_FROM_CMD;
+	static String REPLACED_PATTERN
+	
+	static boolean START_FROM_CMD
 
 }

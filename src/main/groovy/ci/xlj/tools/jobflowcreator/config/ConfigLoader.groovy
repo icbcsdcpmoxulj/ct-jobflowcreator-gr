@@ -19,6 +19,12 @@
 
 package ci.xlj.tools.jobflowcreator.config
 
+/**
+ * Load config from property file
+ * 
+ * @author kfzx-xulj
+ *
+ */
 class ConfigLoader {
 
 	private static Properties props
@@ -34,7 +40,7 @@ class ConfigLoader {
 		Globals.JFC_HOME = JFC_HOME
 
 		props=new Properties()
-		props.load(new FileReader(JFC_HOME + "/jfc-config.properties"))
+		props.load(new FileReader("${JFC_HOME}/${Globals.CONFIG_FILE}"))
 
 		Globals.URL = props.getProperty("URL")
 		Globals.USERNAME = props.getProperty("USERNAME")

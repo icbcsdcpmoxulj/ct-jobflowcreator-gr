@@ -29,11 +29,17 @@ import ci.xlj.libs.utils.OSUtils
 import ci.xlj.tools.jobflowcreator.config.ConfigLoader
 import ci.xlj.tools.jobflowcreator.config.Globals
 
+/**
+ * This tools creates a job flow based on an existing given initial job.
+ * 
+ * @author kfzx-xulj
+ *
+ */
 class JobFlowCreator {
 
 	private Logger logger = Logger.getLogger(JobFlowCreator)
 
-	private def showCopyRight() {
+	private def showInfo() {
 		println '''Job Flow Creator v1.0.0 of 4 Jul. 2014, by Mr. Xu Lijia.
 Send bug reports via email icbcsdcpmoxulj@outlook.com
 This tool is used to create a complete job flow on Jenkins Server at a time.\n'''
@@ -65,7 +71,7 @@ OR
 	private String jobsDir
 
 	private JobFlowCreator(String[] args) {
-		showCopyRight()
+		showInfo()
 
 		if (!args) {
 			showUsage()
@@ -119,6 +125,7 @@ OR
 		}
 	}
 
+	//TODO: filter duplicate jobs
 	private def newJobNames=new HashSet<String>()
 
 	private def message=""
