@@ -12,6 +12,21 @@
 		<junit.version>4.8.2</junit.version>
 	</properties>
 
+	<licenses>
+		<license>
+			<name>Apache License v2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<id>kfzx-xulj</id>
+			<name>Xu Lijia</name>
+			<email>icbcsdcpmoxulj@outlook.com</email>
+		</developer>
+	</developers>
+	
 	<build>
 		<plugins>
 			<plugin>
