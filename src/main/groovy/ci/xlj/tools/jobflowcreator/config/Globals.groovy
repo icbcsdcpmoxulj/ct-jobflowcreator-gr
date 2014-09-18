@@ -22,7 +22,7 @@ package ci.xlj.tools.jobflowcreator.config
 /**
  * Globals vars
  * 
- * @author kfzx-xulj
+ * @author Xu Lijia
  *
  */
 class Globals {

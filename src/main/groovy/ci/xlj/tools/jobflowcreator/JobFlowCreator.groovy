@@ -19,7 +19,7 @@
 
 package ci.xlj.tools.jobflowcreator
 
-import groovy.xml.StreamingMarkupBuilder;
+import groovy.xml.StreamingMarkupBuilder
 
 import org.apache.log4j.Logger
 
@@ -32,7 +32,7 @@ import ci.xlj.tools.jobflowcreator.config.Globals
 /**
  * This tools creates a job flow based on an existing given initial job.
  * 
- * @author kfzx-xulj
+ * @author Xu Lijia
  *
  */
 class JobFlowCreator {

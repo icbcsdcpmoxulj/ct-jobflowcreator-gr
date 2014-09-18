@@ -22,7 +22,7 @@ package ci.xlj.tools.jobflowcreator.config
 /**
  * Load config from property file
  * 
- * @author kfzx-xulj
+ * @author Xu Lijia
  *
  */
 class ConfigLoader {
